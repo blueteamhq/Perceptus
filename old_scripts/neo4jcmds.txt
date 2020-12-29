@@ -1,0 +1,32 @@
+Use the query bellow to load from a CSV file. 
+The file must have the following collumns:
+
+id,timestamp,target,action,user,source
+
+---
+
+LOAD CSV WITH HEADERS
+FROM "file:///ssh.csv"
+AS line FIELDTERMINATOR ","
+MERGE (source:SourceHost { address:line.source })
+CREATE (user:UserName { name:line.user, id:line.id, timestamp:line.timestamp })
+CREATE (source)-[r1:ATTEMPTED_USER]->(user)
+MERGE (action:Action { name:line.action, targetid:line.target})
+CREATE (user)-[r2:CAUSED_ACTION]->(action)
+MERGE (target:TargetHost { address:line.target })
+CREATE (action)-[:ATTEMPTED_TARGET]->(target)
+
+Asset group "Critical" relationship:
+
+MATCH (t:TargetHost {address:"SecOps-sfo01"})
+MERGE (t)-[r:MEMBER_OF]->(a:AssetGroup {name:"Critical"})
+---
+
+Return a subgraph representing all sources and users who had success login into a target:
+
+MATCH (source)-[:ATTEMPTED_USER]->(user)-[:CAUSED_ACTION]->(action:Action {name:"ssh-login-accepted"})-[:ATTEMPTED_TARGET]->(target) RETURN source,user,action,target
+
+Same as above, but with criticality:
+
+MATCH (source)-[:ATTEMPTED_USER]->(user)-[:CAUSED_ACTION]->(action:Action {name:"ssh-login-accepted"})-[:ATTEMPTED_TARGET]->(target)-[:MEMBER_OF]-> (assetGroup:AssetGroup {name:"Critical"}) RETURN source,user,action,target,assetGroup
+
