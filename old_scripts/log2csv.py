@@ -42,7 +42,7 @@ def main(argv):
 def log2csv(infile, outfile, log_type, delimiter_par):
     regex = ''
     if log_type == "ssh" :
-        print "> Going to parse SSH entries..."
+        print("> Going to parse SSH entries...")
         #
         # log samples that match the regex:
         # Nov 11 09:34:08 host sshd[20239]: Invalid user support from 1.2.3.4
@@ -51,14 +51,14 @@ def log2csv(infile, outfile, log_type, delimiter_par):
         regex = "^(.*)\s(.*)\ssshd.*(?:(Invalid user )|(Accepted publickey) for )(\w+)\sfrom\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*"
     #elif log_type == "iptables" :
     else :
-        print "> Log type not implemented yet!"
+        print("> Log type not implemented yet!")
         sys.exit(2)
 
     try:
-        print "> Reading log file '{0}'".format(infile)
+        print("> Reading log file '{0}'".format(infile))
         log = open(infile, 'r')
     except:
-        print "> Ooops... Could not open log file"
+        print("> Ooops... Could not open log file")
         sys.exit(2)
 
 
